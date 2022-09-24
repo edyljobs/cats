@@ -217,7 +217,7 @@ add_action('wp_enqueue_scripts', 'cats_enqueue_styles');
 
 
 function cats_custom_javascript() {
-	wp_enqueue_script( 'jquery-script', get_template_directory_uri() . '/assets/js/jquery-3.4.1.slim.min.js', array(), null, true );
+	wp_enqueue_script( 'jquery-script', get_template_directory_uri() . '/assets/js/jquery.min.js', array(), null, true );
 	wp_enqueue_script( 'bootstrap-script', get_template_directory_uri() . '/assets/js/bootstrap.min.js', array(), null, true );
 	wp_enqueue_script( 'popper-script', get_template_directory_uri() . '/assets/js/popper.min.js', array(), null, true );
 	wp_enqueue_script( 'cats-scripts', get_template_directory_uri() . '/assets/js/cats.js', array(), null, true );
