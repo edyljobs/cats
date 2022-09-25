@@ -22,11 +22,13 @@ jQuery(document).ready(function ($) {
 
   /**
    * todo: This will show details of selected single cat
-   * @param {*} cat_url
+   *
    */
   function show_catDetails() {
     $(".entry-content .form-group").hide();
     $(".entry-content #cats-wrapper").hide();
+    $(".loadmore").attr("style", "visibility:hidden !important;");
+
     let cat_url = localStorage.getItem("cat_url");
     $.ajax({
       url: "https://api.thecatapi.com/v1/images/" + cat_url,
@@ -36,9 +38,9 @@ jQuery(document).ready(function ($) {
         $(".cat-img").attr("src", cats.url);
 
         $.each(cats.breeds, function (index, d) {
-          $(".cat-name").text(d.name);
-          $(".cat-origin").text(d.origin);
-          $(".cat-temperament").text(d.temperament);
+          $(".cat-name").html("<b>" + d.name + "<b>");
+          $(".cat-origin").html("<b>" + d.origin + "<b>");
+          $(".cat-temperament").html("<b>" + d.temperament + "<b>");
           $(".cat-description").text(d.description);
         });
 
@@ -98,6 +100,9 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  /**
+   * todo: This will load cats based on pagination triggered by clicking load more button
+   */
   function loadMoreCats() {
     var catname = localStorage.getItem("current_cat_selected");
     var page = localStorage.getItem("current_page");
@@ -119,7 +124,7 @@ jQuery(document).ready(function ($) {
           $(".loadmore").attr("style", "visibility:visible !important;");
           localStorage.setItem("current_page", nextpage);
 
-          // Stop showing cats its weird at page 3
+          // ? Stop showing cats its weird at page 3
           // ?  Api is constantly throwing 10 random cats unlimited?
           if (nextpage >= 3) {
             $(".loadmore").attr("style", "visibility:hidden !important;");
