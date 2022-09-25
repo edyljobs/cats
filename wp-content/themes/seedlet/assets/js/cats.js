@@ -11,9 +11,7 @@ jQuery(document).ready(function ($) {
       type: "GET",
       dataType: "json",
       success: function (cats) {
-        console.log(cats);
         $.each(cats, function (index, d) {
-          console.log(index, d.name);
           let catname = d.name;
           let cat_id = d.id;
           $(element_id).append($("<option>", { value: cat_id, text: catname }));
@@ -22,18 +20,40 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  $("#cats").on("change", function () {
-    localStorage.setItem("current_cat_selected", this.value);
+  function show_catDetails() {
+    $(".entry-content .form-group").hide();
+    $(".entry-content #cats-wrapper").hide();
+    let cat_url = localStorage.getItem("cat_url");
+    $.ajax({
+      url: "https://api.thecatapi.com/v1/images/" + cat_url,
+      type: "GET",
+      dataType: "json",
+      success: function (cats) {
+        $(".cat-img").attr("src", cats.url);
+
+        $.each(cats.breeds, function (index, d) {
+          $(".cat-name").text(d.name);
+          $(".cat-origin").text(d.origin);
+          $(".cat-temperament").text(d.temperament);
+          $(".cat-description").text(d.description);
+        });
+
+        $(".cat-details").show();
+      },
+    });
+  }
+
+  function get_catBreedByName(catname) {
     $.ajax({
       url:
         "https://api.thecatapi.com/v1/images/search?page=1&limit=10&breed_id=" +
-        this.value,
+        catname,
       type: "GET",
       dataType: "json",
       success: function (cats) {
         var collected_cats = "";
         $.each(cats, function (index, d) {
-          // Logic for adding rows after getting per 3 cats
+          // Logic for adding rows after getting per 3 cat data
           if (index % 3 == 0) {
             collected_cats += '<div class="row">';
           }
@@ -52,10 +72,24 @@ jQuery(document).ready(function ($) {
         $(".view-cat").click(function () {
           var cat_url = $(this).attr("data-url");
           // Store to localstorage so we can reference what
-          // image of cat we are viewing
+          // image of cat we are currently viewing
           localStorage.setItem("cat_url", cat_url);
+          show_catDetails();
         });
       },
     });
+  }
+
+  $("#cats").on("change", function () {
+    localStorage.setItem("current_cat_selected", this.value);
+    get_catBreedByName(this.value);
+  });
+
+  $(".back-to-cats").click(function () {
+    $(".cat-details").hide();
+    $(".entry-content .form-group").show();
+    $(".entry-content #cats-wrapper").show();
+    let cat_name = localStorage.getItem("current_cat_selected");
+    get_catBreedByName(cat_name);
   });
 });

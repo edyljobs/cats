@@ -1,3 +1,20 @@
 body {
   padding: 0px;
 }
+
+.cat-details {
+  display: none;
+}
+
+.card {
+  margin-bottom: 20px;
+  background: #e9ecef !important;
+}
+
+.card-img-top {
+  height: 150px;
+}
+
+.loadmore {
+  display: none !important;
+}
