@@ -221,5 +221,8 @@ function cats_custom_javascript() {
 	wp_enqueue_script( 'bootstrap-script', get_template_directory_uri() . '/assets/js/bootstrap.min.js', array(), null, true );
 	wp_enqueue_script( 'popper-script', get_template_directory_uri() . '/assets/js/popper.min.js', array(), null, true );
 	wp_enqueue_script( 'cats-scripts', get_template_directory_uri() . '/assets/js/cats.js', array(), null, true );
+	wp_enqueue_script( 'swal-scripts', 'https://unpkg.com/sweetalert/dist/sweetalert.min.js', array(), null, true );
+
+	
 }
 add_action('wp_enqueue_scripts', 'cats_custom_javascript');

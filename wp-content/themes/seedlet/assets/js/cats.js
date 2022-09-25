@@ -20,6 +20,10 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  /**
+   * todo: This will show details of selected single cat
+   * @param {*} cat_url
+   */
   function show_catDetails() {
     $(".entry-content .form-group").hide();
     $(".entry-content #cats-wrapper").hide();
@@ -40,9 +44,16 @@ jQuery(document).ready(function ($) {
 
         $(".cat-details").show();
       },
+      error: function (request, status, error) {
+        swal("Something went wrong unable to fetch cat details", "", "error");
+      },
     });
   }
 
+  /**
+   * todo: This will search cats based on breed name
+   * @param {*} catname
+   */
   function get_catBreedByName(catname) {
     $.ajax({
       url:
@@ -52,22 +63,26 @@ jQuery(document).ready(function ($) {
       dataType: "json",
       success: function (cats) {
         var collected_cats = "";
-        $.each(cats, function (index, d) {
-          // Logic for adding rows after getting per 3 cat data
-          if (index % 3 == 0) {
-            collected_cats += '<div class="row">';
-          }
+        console.log(cats.length);
+        if (cats.length == 10) {
+          // Show loadmore button because next page has items
+          $(".loadmore").attr("style", "visibility:visible !important;");
+          localStorage.setItem("current_page", 1);
+        } else {
+          // Hide loadmore button because next page has no items
+          $(".loadmore").attr("style", "visibility:hidden !important;");
+          localStorage.setItem("current_page", 1);
+        }
 
+        $.each(cats, function (index, d) {
           collected_cats +=
             '<div class="col-md-4 col-sm-6 col-12"><div class="card"><img class="card-img-top" src="' +
             d.url +
             '"><div class="card-body"><button class="btn btn-primary btn-block view-cat" data-url="' +
             d.id +
             '">View details</button></div></div></div>';
-
-          if (index % 3 == 2) collected_cats += "</div>";
         });
-        $("#cats-wrapper").html(collected_cats);
+        $("#cats-wrapper .row").html(collected_cats);
 
         $(".view-cat").click(function () {
           var cat_url = $(this).attr("data-url");
@@ -76,6 +91,65 @@ jQuery(document).ready(function ($) {
           localStorage.setItem("cat_url", cat_url);
           show_catDetails();
         });
+      },
+      error: function (request, status, error) {
+        swal("Something went wrong unable to fetch cats", "", "error");
+      },
+    });
+  }
+
+  function loadMoreCats() {
+    var catname = localStorage.getItem("current_cat_selected");
+    var page = localStorage.getItem("current_page");
+    var nextpage = +page + 1;
+
+    $.ajax({
+      url:
+        "https://api.thecatapi.com/v1/images/search?page=" +
+        nextpage +
+        "&limit=10&breed_id=" +
+        catname,
+      type: "GET",
+      dataType: "json",
+      success: function (cats) {
+        var collected_cats = "";
+        console.log(cats.length);
+        if (cats.length == 10) {
+          // Show loadmore button because next page has items
+          $(".loadmore").attr("style", "visibility:visible !important;");
+          localStorage.setItem("current_page", nextpage);
+
+          // Stop showing cats its weird at page 3
+          // ?  Api is constantly throwing 10 random cats unlimited?
+          if (nextpage >= 3) {
+            $(".loadmore").attr("style", "visibility:hidden !important;");
+          }
+        } else {
+          // Hide loadmore button because next page has no items
+          $(".loadmore").attr("style", "visibility:hidden !important;");
+          localStorage.setItem("current_page", 1);
+        }
+
+        $.each(cats, function (index, d) {
+          collected_cats +=
+            '<div class="col-md-4 col-sm-6 col-12"><div class="card"><img class="card-img-top" src="' +
+            d.url +
+            '"><div class="card-body"><button class="btn btn-primary btn-block view-cat" data-url="' +
+            d.id +
+            '">View details</button></div></div></div>';
+        });
+        $("#cats-wrapper .row").append(collected_cats);
+
+        $(".view-cat").click(function () {
+          var cat_url = $(this).attr("data-url");
+          // Store to localstorage so we can reference what
+          // image of cat we are currently viewing
+          localStorage.setItem("cat_url", cat_url);
+          show_catDetails();
+        });
+      },
+      error: function (request, status, error) {
+        swal("Something went wrong unable to fetch cats", "", "error");
       },
     });
   }
@@ -91,5 +165,9 @@ jQuery(document).ready(function ($) {
     $(".entry-content #cats-wrapper").show();
     let cat_name = localStorage.getItem("current_cat_selected");
     get_catBreedByName(cat_name);
+  });
+
+  $(".loadmore").click(function () {
+    loadMoreCats();
   });
 });

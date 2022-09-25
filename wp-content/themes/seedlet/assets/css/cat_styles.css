@@ -16,5 +16,5 @@ body {
 }
 
 .loadmore {
-  display: none !important;
+  visibility: hidden;
 }
